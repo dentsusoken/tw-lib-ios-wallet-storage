@@ -126,7 +126,7 @@ public class KeyChainStorageService: DataStorageService {
 	}
 	
 	public func deleteDocumentData(id: String, for saveType: SavedKeyChainDataType) throws {
-		let query: [String: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: serviceToSave(for: saveType), kSecAttrAccount: id] as [String: Any]
+		let query: [String: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: serviceToSave(for: saveType), kSecAttrAccount: id, kSecAttrSynchronizable: kCFBooleanTrue!] as [String: Any]
 		let status = SecItemDelete(query as CFDictionary)
 		let statusMessage = SecCopyErrorMessageString(status, nil) as? String
 		guard status == errSecSuccess else { throw StorageError(description: statusMessage ?? "", code: Int(status)) 	}
@@ -144,7 +144,7 @@ public class KeyChainStorageService: DataStorageService {
 		// kSecAttrAccount is used to store the secret Id so that we can look it up later
 		// kSecAttrService is always set to serviceName to enable us to lookup all our secrets later if needed
 		// kSecAttrType is used to store the secret type to allow us to cast it to the right Type on search
-		let query: [String: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: serviceToSave(for: saveType)] as [String: Any]
+		let query: [String: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: serviceToSave(for: saveType), kSecAttrSynchronizable: kCFBooleanTrue!] as [String: Any]
 		let status = SecItemDelete(query as CFDictionary)
 		let statusMessage = SecCopyErrorMessageString(status, nil) as? String
 		guard status == errSecSuccess else {
