@@ -66,6 +66,16 @@ public class KeyChainStorageService: DataStorageService {
 		}
 		return (result as! [NSDictionary])
 	}
+    
+    public func loadPresentationLog() throws -> [PresentationLog]?{
+        guard let dicts1 = try loadDocumentsData(for: .log) else { return nil }
+        let decoder = JSONDecoder()
+        let logs = try dicts1.compactMap { dict in
+            let data = dict[kSecValueData] as! Data
+            return try decoder.decode(PresentationLog.self, from: data)
+        }
+        return logs
+    }
 
 	/// Save the secret to keychain
 	/// Note: the value passed in will be zeroed out after the secret is saved
@@ -79,7 +89,7 @@ public class KeyChainStorageService: DataStorageService {
 	}
 	
 	func serviceToSave(for dataToSaveType: SavedKeyChainDataType) -> String {
-		switch dataToSaveType { case .key: serviceName + "_key"; default: serviceName }
+        switch dataToSaveType { case .key: serviceName + "_key"; case .log: serviceName + "_log"; default: serviceName }
 	}
 
 	public func saveDocumentData(_ document: Document, dataToSaveType: SavedKeyChainDataType, dataType: String, allowOverwrite: Bool = true) throws {
@@ -115,6 +125,26 @@ public class KeyChainStorageService: DataStorageService {
 			throw StorageError(description: statusMessage ?? "", code: Int(status))
 		}
 	}
+    
+    public func savePresentationLog(log: PresentationLog, dataToSaveType: SavedKeyChainDataType)throws {
+        var query: [String: Any] = [
+            kSecClass: kSecClassGenericPassword,
+             kSecAttrService: serviceToSave(for: dataToSaveType),
+              kSecAttrAccount: log.id,
+              kSecAttrSynchronizable: kCFBooleanTrue!
+        ] as [String: Any]
+        #if os(macOS)
+        query[kSecUseDataProtectionKeychain as String] = true
+       #endif
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(log)
+        query[kSecValueData as String] = data
+        let status = SecItemAdd(query as CFDictionary, nil)
+        let statusMessage = SecCopyErrorMessageString(status, nil) as? String
+        guard status == errSecSuccess else {
+            throw StorageError(description: statusMessage ?? "", code: Int(status))
+        }
+    }
 	
 	/// Delete the secret from keychain
 	/// Note: the value passed in will be zeroed out after the secret is deleted
@@ -124,6 +154,10 @@ public class KeyChainStorageService: DataStorageService {
 		try deleteDocumentData(id: id, for: .doc)
 		try? deleteDocumentData(id: id, for: .key)
 	}
+    
+    public func deletePresentationLog(id: String) throws {
+        try deleteDocumentData(id: id, for: .log)
+    }
 	
 	public func deleteDocumentData(id: String, for saveType: SavedKeyChainDataType) throws {
 		let query: [String: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: serviceToSave(for: saveType), kSecAttrAccount: id, kSecAttrSynchronizable: kCFBooleanTrue!] as [String: Any]

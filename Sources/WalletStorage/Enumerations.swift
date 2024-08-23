@@ -20,6 +20,7 @@ import Foundation
 public enum SavedKeyChainDataType{
 	case doc
 	case key
+    case log
 }
 
 /// Format of document data

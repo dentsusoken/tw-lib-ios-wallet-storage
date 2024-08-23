@@ -22,8 +22,11 @@ public protocol DataStorageService {
 	var accessGroup: String? { get set }
 	func loadDocument(id: String) throws -> Document?
 	func loadDocuments() throws -> [Document]?
+    func loadPresentationLog() throws -> [PresentationLog]?
 	func saveDocument(_ document: Document, allowOverwrite: Bool) throws
 	func saveDocumentData(_ document: Document, dataToSaveType: SavedKeyChainDataType, dataType: String, allowOverwrite: Bool) throws 
+    func savePresentationLog(log:PresentationLog, dataToSaveType: SavedKeyChainDataType)throws
 	func deleteDocument(id: String) throws
+    func deletePresentationLog(id: String) throws
 	func deleteDocuments() throws
 }
