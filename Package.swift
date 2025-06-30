@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
-        .package(path: "../tw-lib-ios-iso18013-data-model"),
+        .package(url: "https://github.com/dentsusoken/tw-lib-ios-iso18013-data-model.git", branch: "feat-UnifiedID"),
 		],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
