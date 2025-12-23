@@ -26,6 +26,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
 				.product(name: "MdocDataModel18013", package: "tw-lib-ios-iso18013-data-model"),
+				.product(name: "SiopOpenID4VP", package: "eudi-lib-ios-siop-openid4vp-swift"),
             ]),
         .testTarget(
             name: "WalletStorageTests",
